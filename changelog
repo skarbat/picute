@@ -1,0 +1,13 @@
+
+        November 23, 2016: version 1.10
+	Upgrade to QT 5.7, with Webengine
+
+	March 20, 2016: version 1.07
+	Added webview
+
+	February 30, 2016: version 1.06
+	Added qtwayland and compositor support
+
+	February 25, 2016: version 1.05
+	QT5.5
+
