@@ -26,21 +26,21 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Apply the patch file against the webengine sources
-    patch_file='qtwebengine-rpi.patch'
-    webengine_path=os.path.join(picute.query('tmp'), 'qt5/qtwebengine')
-    if not os.path.isdir(webengine_path):
-        print '>>> Could not find path: {}'.format(webengine_path)
-        sys.exit(1)
-    else:
-        if not os.path.isfile('{}/{}'.format(webengine_path, patch_file)):
-            print '>>> Applying patch file: {}'.format(patch_file)
-            rc1=os.system('cp {} {}'.format(patch_file, webengine_path))
-            rc2=os.system('cd {} ; git apply {}'.format(webengine_path, patch_file))
-            if rc1 or rc2:
-                print 'Could not apply patch'
-                sys.exit(1)
-            else:
-                print '>>> Webengine patch has been applied'
+    #patch_file='qtwebengine-rpi.patch'
+    #webengine_path=os.path.join(picute.query('tmp'), 'qt5/qtwebengine')
+    #if not os.path.isdir(webengine_path):
+    #    print '>>> Could not find path: {}'.format(webengine_path)
+    #    sys.exit(1)
+    #else:
+    #    if not os.path.isfile('{}/{}'.format(webengine_path, patch_file)):
+    #        print '>>> Applying patch file: {}'.format(patch_file)
+    #        rc1=os.system('cp {} {}'.format(patch_file, webengine_path))
+    #        rc2=os.system('cd {} ; git apply {}'.format(webengine_path, patch_file))
+    #        if rc1 or rc2:
+    #            print 'Could not apply patch'
+    #            sys.exit(1)
+    #        else:
+    #            print '>>> Webengine patch has been applied'
 
     # Now mount image if needed
     print '>>> Accessing image...'
@@ -50,11 +50,12 @@ if __name__ == '__main__':
 
     # Step 1: QMAKE
     print '>>> Running Qmake...'
+    webengine_path=os.path.join(picute.query('tmp'), 'qt5/qtwebengine')
     cmdline_prefix='export PKG_CONFIG_PATH={}/usr/lib/arm-linux-gnueabihf/pkgconfig'.format(picute.query('sysroot'))
-
     print '>>> cmdline_prefix: ', cmdline_prefix
-    rc=os.system('{} ; cd {} ; {}/usr/local/qt5/bin/qmake'.format(
-        cmdline_prefix, webengine_path, picute.query('sysroot')))
+    rc=os.system('{} ; cd {} ; {}/usr/local/qt5/bin/qmake -r ' \
+                 'WEBENGINE_CONFIG+=use_proprietary_codecs WEBENGINE_CONFIG+=use_system_ffmpeg'.format(
+                     cmdline_prefix, webengine_path, picute.query('sysroot')))
     if rc:
         print '>>> Qmake failed rc={} :-('.format(rc)
         sys.exit(1)

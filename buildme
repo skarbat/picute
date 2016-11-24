@@ -15,4 +15,3 @@ export PKG_CONFIG_PATH="$(xsysroot -q sysroot)/usr/lib/arm-linux-gnueabihf/pkgco
     
 echo "Building picute - follow progress on $logfile"
 python -u picute.py $xsysroot_profile --baptize > $logfile 2>&1
-

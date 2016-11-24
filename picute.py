@@ -128,11 +128,18 @@ def baptize_image(picute):
         'libwayland-dev libxkbcommon-dev build-essential git-core libfontconfig1-dev ' \
         'libasound2-dev libinput-dev libmtdev-dev libproxy-dev libdirectfb-dev ' \
         'libts-dev libudev-dev libxcb-xinerama0-dev ' \
-        'libdbus-1-dev libicu-dev libglib2.0-dev'
+        'libdbus-1-dev libicu-dev libglib2.0-dev ' \
+        'libavutil-dev=7:3.2-2~bpo8+2 libavcodec-dev=7:3.2-2~bpo8+2 libavformat-dev=7:3.2-2~bpo8+2 ' \
+        'libvpx=1.6.0-2~bpo8+1 libopus-dev libopusfile-dev libwebp-dev '
+    
+    # Webengine specific dependencies (for FFMPEG native build mode) are pulled from Debian ARM backports repo
+    picute.edfile('/etc/apt/sources.list.d/raspberrypi-backports.list',
+                  'deb http://httpredir.debian.org/debian jessie-backports main contrib')
+    picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553')
+    picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010')
 
     if picute.execute('apt-get update'):
         return False
-
     if picute.execute('apt-get install -y --no-install-recommends {}'.format(qt5_builddeps)):
         return False
 
@@ -186,13 +193,8 @@ if __name__ == '__main__':
 
     # prepare some commonly used paths and variables
     xtmp=picute.query('tmp')
-
     host_numcpus=multiprocessing.cpu_count()
-    if host_numcpus > 4:
-        # Bizarre but sometimes too many cpus break the build
-        host_numcpus = host_numcpus / 2
-
-    qt5_version='5.7'
+    qt5_version='5.7.1'
     qt5_srcdir=os.path.join(xtmp, 'qt5')
     rpi_tools='/opt/rpi-tools'
     qt5_path_prefix='/usr/local/qt5'
@@ -212,15 +214,6 @@ if __name__ == '__main__':
     configure_done=os.path.join(xtmp, 'configure_done.chk')
     make_done=os.path.join(xtmp, 'make_done.chk')
     make_install_done=os.path.join(xtmp, 'make_install_done.chk')
-
-    #configure_opts='-opengl es2 -eglfs -xcb -device linux-rasp-pi2-g++ ' \
-    #    '-device-option CROSS_COMPILE={}/{} ' \
-    #    '-sysroot {} -opensource -confirm-license -release -skip qtwayland ' \
-    #    '-prefix {} -pkg-config -no-pch -alsa -no-use-gold-linker -qt-xkbcommon ' \
-    #    '-xkb-config-root /usr/share/X11/xkb -nomake tests -nomake examples ' \
-    #    '-verbose -no-warnings-are-errors -no-qml-debug ' \
-    #    '-optimized-qmake -strip'.format(rpi_tools, xgcc_path + '/arm-linux-gnueabihf-',
-    #                                     picute.query('sysroot'), qt5_path_prefix)
 
     configure_opts='-opengl es2 -eglfs -xcb -device linux-rasp-pi2-g++ ' \
         '-device-option CROSS_COMPILE={}/{} ' \

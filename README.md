@@ -89,7 +89,16 @@ is to boot Picute on a networked RaspberryPI, and remote mount the sysroot, like
 
 Pass `posys` for the network password.
 
-##References
+##Webengine 5.7.1 dependencies
+
+The following webengine dependencies can be installed manually:
+
+ * http://httpredir.debian.org/debian/pool/main/f/ffmpeg/libavutil55_3.2-2~bpo8+2_armhf.deb
+ * http://httpredir.debian.org/debian/pool/main/f/ffmpeg/libavcodec57_3.2-2~bpo8+2_armhf.deb
+ * http://httpredir.debian.org/debian/pool/main/f/ffmpeg/libavformat57_3.2-2~bpo8+2_armhf.deb
+ * http://httpredir.debian.org/debian/pool/main/libv/libvpx/libvpx4_1.6.0-2~bpo8+1_armhf.deb
+
+###References
 
  * https://github.com/CalumJEadie/part-ii-individual-project-dev/wiki/Project-Proposal-Research
  * https://wiki.qt.io/Building_Qt_5_from_Git
