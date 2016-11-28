@@ -158,8 +158,8 @@ def baptize_image(picute):
     picute.execute('rm -fv /usr/lib/arm-linux-gnueabihf/libudev.so')
     os.system ('sudo ln -sfv {}/lib/arm-linux-gnueabihf/libudev.so.1.5.0 ' \
                '{}/usr/lib/arm-linux-gnueabihf/libudev.so'.format(
-                   xsysroot.query('sysroot'),
-                   xsysroot.query('sysroot')))
+                   picute.query('sysroot'),
+                   picute.query('sysroot')))
 
     return True
 
