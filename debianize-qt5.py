@@ -102,6 +102,10 @@ if __name__ == '__main__':
 
             os.system('cp -rvP {} {}'.format(os.path.join(complete_source, files), target_files_path))
 
+        # Cleanup anything related to webengine
+        cmd='find ' + target_files_path + ' -iname \*webengine\* -exec rm -rfv {} \;'
+        os.system(cmd)
+
         # create the Debian control file for "dpkg-deb" tool to know what to pack
         debian_dir=os.path.join(versioned_pkg_name, 'DEBIAN')
         if not os.path.exists(debian_dir):

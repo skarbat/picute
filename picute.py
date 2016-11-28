@@ -128,15 +128,17 @@ def baptize_image(picute):
         'libwayland-dev libxkbcommon-dev build-essential git-core libfontconfig1-dev ' \
         'libasound2-dev libinput-dev libmtdev-dev libproxy-dev libdirectfb-dev ' \
         'libts-dev libudev-dev libxcb-xinerama0-dev ' \
-        'libdbus-1-dev libicu-dev libglib2.0-dev ' \
-        'libavutil-dev=7:3.2-2~bpo8+2 libavcodec-dev=7:3.2-2~bpo8+2 libavformat-dev=7:3.2-2~bpo8+2 ' \
-        'libvpx=1.6.0-2~bpo8+1 libopus-dev libopusfile-dev libwebp-dev '
+        'libdbus-1-dev libicu-dev libglib2.0-dev '
+
+        # was needed for ffmpeg native libs
+        #'libavutil-dev=7:3.2-2~bpo8+2 libavcodec-dev=7:3.2-2~bpo8+2 libavformat-dev=7:3.2-2~bpo8+2 ' \
+        #'libvpx=1.6.0-2~bpo8+1 libopus-dev libopusfile-dev libwebp-dev '
     
     # Webengine specific dependencies (for FFMPEG native build mode) are pulled from Debian ARM backports repo
-    picute.edfile('/etc/apt/sources.list.d/raspberrypi-backports.list',
-                  'deb http://httpredir.debian.org/debian jessie-backports main contrib')
-    picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553')
-    picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010')
+    #picute.edfile('/etc/apt/sources.list.d/raspberrypi-backports.list',
+    #              'deb http://httpredir.debian.org/debian jessie-backports main contrib')
+    #picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553')
+    #picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010')
 
     if picute.execute('apt-get update'):
         return False
@@ -150,6 +152,14 @@ def baptize_image(picute):
     picute.execute('cp -fv /lib/arm-linux-gnueabihf/libdl.so.2 /usr/lib/arm-linux-gnueabihf/libdl.so')
     picute.execute('rm -fv /usr/lib/arm-linux-gnueabihf/libm.so')
     picute.execute('cp -fv /lib/arm-linux-gnueabihf/libm.so.6 /usr/lib/arm-linux-gnueabihf/libm.so')
+
+    # Fix relative path for libudev library. This fixes plugging HID devices on-the-fly
+    # The reason for this ugly patch is that "configure" seems to have lost the relative sysroot directory
+    picute.execute('rm -fv /usr/lib/arm-linux-gnueabihf/libudev.so')
+    os.system ('sudo ln -sfv {}/lib/arm-linux-gnueabihf/libudev.so.1.5.0 ' \
+               '{}/usr/lib/arm-linux-gnueabihf/libudev.so'.format(
+                   picute.query('sysroot'),
+                   picute.query('sysroot')))
 
     return True
 
@@ -303,11 +313,8 @@ if __name__ == '__main__':
     num_failed_tests = test_image(picute, qt5_path_prefix)
     print '>>> tests complete failed={}'.format(num_failed_tests)
 
-
-    #
-    # TODO:  Step 7 => Build webkit (separate python module?)
-    #
-
+    # Create QT5 core library packages
+    rc=os.system('python debianize-qt5.py {} {}'.format(picute.query('sysroot'), qt5_path_prefix))
 
     # unmount the image and release it
     print '>>> releasing and cleaning image'
@@ -328,4 +335,4 @@ if __name__ == '__main__':
 
     time_end=time.time()
     print 'Process finished in {} secs - image ready at {}'.format(time_end - time_start, output_image)
-    sys.exit(0)
+    sys.exit(rc)
