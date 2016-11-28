@@ -53,8 +53,8 @@ if __name__ == '__main__':
     webengine_path=os.path.join(picute.query('tmp'), 'qt5/qtwebengine')
     cmdline_prefix='export PKG_CONFIG_PATH={}/usr/lib/arm-linux-gnueabihf/pkgconfig'.format(picute.query('sysroot'))
     print '>>> cmdline_prefix: ', cmdline_prefix
-    rc=os.system('{} ; cd {} ; {}/usr/local/qt5/bin/qmake -r ' \
-                 'WEBENGINE_CONFIG+=use_proprietary_codecs WEBENGINE_CONFIG+=use_system_ffmpeg'.format(
+    rc=os.system('{} ; cd {} ; {}/usr/local/qt5/bin/qmake ' \
+                 'WEBENGINE_CONFIG+=use_proprietary_codecs'.format(
                      cmdline_prefix, webengine_path, picute.query('sysroot')))
     if rc:
         print '>>> Qmake failed rc={} :-('.format(rc)

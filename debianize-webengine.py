@@ -31,9 +31,7 @@ Description: {pkg_description}
 '''
 
 # Webengine extra core dependencies
-# Specific versions available from: http://httpredir.debian.org/debian/
-extra_deps='libavutil57 (>= 7:3.2-2~bpo8+2), libavcodec57 (>= 7:3.2-2~bpo8+2), ' \
-    'libavformat57 (>= 7:3.2-2~bpo8+2), libopus0, libopusfile0, libwebp5, libvpx4 (>= 1.6.0-2~bpo8+1)'
+extra_deps=''
 
 packages=[
 
@@ -47,7 +45,7 @@ packages=[
   
       'pkg_name': 'libqt5webengine',
       'pkg_version': qt5_version,
-      'pkg_depends': 'libqt5all, {}'.format(extra_deps),
+      'pkg_depends': 'libqt5all{}'.format(extra_deps),
       'pkg_description': 'QT5 WebEngine Libraries and basic tools'
   },
 
