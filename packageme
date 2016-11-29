@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Pakckage script - Builds a native ARM qmake, and creates Debian packages
+#
+
+xsysroot_profile="picute"
+logfile="package.log"
+checkfile=native_tools_built.chk
+
+if [ "$1" != "" ]; then
+    xsysroot_profile=$1
+fi
+
+if [-f $(xsysroot -q tmp)/$checkfile ]; then
+    echo ">>> Looks like native tools are already built"
+    exit 0
+fi
+
+# Do a backup copy of the x86 version of the build tools
+if [ ! -d "$(xsysroot -q sysroot)/usr/local/qt5/bin-x86_64" ]; then
+    echo ">>> Backing up all cross compiled build tools"
+    sudo mv $(xsysroot -q sysroot)/usr/local/qt5/bin $(xsysroot -q sysroot)/usr/local/qt5/bin-x86_64
+fi
+
+echo ">>> Now Building qmake for the RaspberryPI... it might take a while"
+
+# Clone qt5 sources and pull the qtbase tools alone (for qmake and friends)
+# FIXME: Centralize many of the variables below
+cp native-tools.sh $(xsysroot -q tmp)
+cd $(xsysroot -q tmp)
+if [ ! -d qt5-native ]; then
+    git clone git://code.qt.io/qt/qt5.git qt5-native
+    cd qt5-native
+    git checkout 5.7.1
+    git submodule init qtbase
+    git submodule update qtbase
+else
+    cd qt5-native
+fi
+
+xsysroot -x /tmp/native-tools.sh
+if [ "$?" == "0" ]; then
+    xsysroot -x "cd /tmp/qt5-native/qtbase && make install"
+    touch $(xsysroot -q tmp)/$checkfile
+    xsysroot -x "cp /tmp/qt5-native/qtbase/ && make install"
+
+fi
+
+echo ">>> Now Building extrat tools (moc, rcc etc)"
+# TODO:
+
+echo ">>> Now debianizing the QT5 and Webengine..."
+
+python -u debianize-qt5.py $(xsysroot -q sysroot) /usr/local/qt5 > $logfile 2>&1
+python -u debianize-webengine.py $(xsysroot -q sysroot) /usr/local/qt5 >> $logfile 2>&1
+echo "Build finished"
