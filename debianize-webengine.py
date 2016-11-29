@@ -38,6 +38,7 @@ packages=[
     # QtWebEngine Runtime package
     { 'fileset': [ 'translations/qtwebengine_locales/*',
                    'resources/qtwebengine_resources*pak',
+                   'resources/qtwebengine_devtools_resources.pak',
                    'resources/icudtl.dat',
                    'lib/libQt5WebEngine*',
                    'qml/QtWebEngine/*',
