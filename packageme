@@ -38,13 +38,20 @@ else
     cd qt5-native
 fi
 
+# Native configure
 xsysroot -x /tmp/native-tools.sh
-if [ "$?" == "0" ]; then
-    xsysroot -x "cd /tmp/qt5-native/qtbase && make install"
-    touch $(xsysroot -q tmp)/$checkfile
-    xsysroot -x "cp /tmp/qt5-native/qtbase/ && make install"
-
+if [ "$?" != "0" ]; then
+    exit 1
+else
+    xsysroot -x "mkdir /usr/local/qt5/bin"
+    xsysroot -x "cp /tmp/qt5-native/qtbase/bin/qmake /usr/local/qt5/bin"
 fi
+
+cd /tmp/qt5-native/qtbase/src/tools/moc
+export PATH=$PATH:/usr/local/qt5/bin
+qmake
+
+
 
 echo ">>> Now Building extrat tools (moc, rcc etc)"
 # TODO:
