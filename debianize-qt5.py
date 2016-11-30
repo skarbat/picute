@@ -113,6 +113,9 @@ if __name__ == '__main__':
         with open(os.path.join(debian_dir, 'control'), 'w') as control_file:
             control_file.writelines(control_skeleton.format(**pkg))
 
+        # copy the shlibs file
+        os.system('cp {} {}/shlibs.local'.format('shlibs.local-qt5', debian_dir))
+
         # finally call dpkg-deb and generate a debian package
         rc=os.system('dpkg-deb --build {}'.format(versioned_pkg_name))
         if not rc:
