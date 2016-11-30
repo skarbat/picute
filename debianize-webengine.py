@@ -114,8 +114,10 @@ if __name__ == '__main__':
         with open(os.path.join(debian_dir, 'control'), 'w') as control_file:
             control_file.writelines(control_skeleton.format(**pkg))
 
-        # copy the shlibs file
-        os.system('cp {} {}/shlibs.local'.format('shlibs.local-webengine', debian_dir))
+        # copy the shlibs file for the runtime package
+        if pkg['pkg_name'] == 'libqt5webengine':
+            os.system('mkdir -p {}/../var/lib/dpkg/info'.format(debian_dir))
+            os.system('cp -v {} {}/../var/lib/dpkg/info/libqt5webengine.shlibs'.format('shlibs.local-webengine', debian_dir))
 
         # finally call dpkg-deb and generate a debian package
         rc=os.system('dpkg-deb --build {}'.format(versioned_pkg_name))
