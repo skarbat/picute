@@ -38,6 +38,7 @@ packages=[
     # QtWebEngine Runtime package
     { 'fileset': [ 'translations/qtwebengine_locales/*',
                    'resources/qtwebengine_resources*pak',
+                   'resources/qtwebengine_devtools_resources.pak',
                    'resources/icudtl.dat',
                    'lib/libQt5WebEngine*',
                    'qml/QtWebEngine/*',
@@ -53,6 +54,7 @@ packages=[
     # QtWebEngine Developer's package
     { 'fileset': [ 'include/QtWebEngineWidgets/*',
                    'include/QtWebEngine/*',
+                   'include/QtWebEngineCore/*',
                    'mkspecs/modules/qt_lib_webengine*',
                    'lib/cmake/Qt5WebEngine*',
                    'lib/pkgconfig/Qt5WebEngine*'
@@ -111,6 +113,10 @@ if __name__ == '__main__':
             os.makedirs(debian_dir)
         with open(os.path.join(debian_dir, 'control'), 'w') as control_file:
             control_file.writelines(control_skeleton.format(**pkg))
+
+        # copy the shlibs file for the runtime package
+        if pkg['pkg_name'] == 'libqt5webengine':
+            os.system('cp -v {} {}/shlibs'.format('shlibs.local-webengine', debian_dir))
 
         # finally call dpkg-deb and generate a debian package
         rc=os.system('dpkg-deb --build {}'.format(versioned_pkg_name))

@@ -33,7 +33,7 @@ Description: {pkg_description}
 # These are the X11 libraries on which QT5 depends on, provides XCB subsystem
 extra_deps = 'libx11-xcb1, libxcb-icccm4, libxcb-xfixes0, libxcb-image0, libxcb-keysyms1, libxcomposite1, ' \
     'libxcb-randr0, libxcb-render-util0, libxrender1, libxext6, libxcb-glx0, libfontconfig1, ' \
-    'libinput5, libts-0.0-0'
+    'libinput5, libts-0.0-0, libjpeg62-turbo, libasound2, libproxy1, libicu52'
 
 # These are the packages we are building
 # For the moment we are collecting everyting in one single Debian pkg
@@ -112,6 +112,10 @@ if __name__ == '__main__':
             os.makedirs(debian_dir)
         with open(os.path.join(debian_dir, 'control'), 'w') as control_file:
             control_file.writelines(control_skeleton.format(**pkg))
+
+        # copy the shlibs file for the runtime package
+        if pkg['pkg_name'] == 'libqt5all':
+            os.system('cp -v {} {}/shlibs'.format('shlibs.local-qt5', debian_dir))
 
         # finally call dpkg-deb and generate a debian package
         rc=os.system('dpkg-deb --build {}'.format(versioned_pkg_name))
