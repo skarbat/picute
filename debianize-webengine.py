@@ -54,6 +54,7 @@ packages=[
     # QtWebEngine Developer's package
     { 'fileset': [ 'include/QtWebEngineWidgets/*',
                    'include/QtWebEngine/*',
+                   'include/QtWebEngineCore/*',
                    'mkspecs/modules/qt_lib_webengine*',
                    'lib/cmake/Qt5WebEngine*',
                    'lib/pkgconfig/Qt5WebEngine*'
