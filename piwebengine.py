@@ -9,6 +9,9 @@ import xsysroot
 
 if __name__ == '__main__':
 
+    debug_build=False
+    build_mode='release' if not debug_build else 'debug'
+
     # We need a xsysroot profile with QT5 built in it
     if len(sys.argv) > 1:
         xprofile=sys.argv[1]
@@ -53,9 +56,10 @@ if __name__ == '__main__':
     print '>>> Running Qmake...'
     cmdline_prefix='export PKG_CONFIG_PATH={}/usr/lib/arm-linux-gnueabihf/pkgconfig'.format(picute.query('sysroot'))
     print '>>> cmdline_prefix: ', cmdline_prefix
-    rc=os.system('{} ; cd {} ; {}/usr/local/qt5/bin/qmake ' \
-                 'WEBENGINE_CONFIG+=use_proprietary_codecs'.format(
-                     cmdline_prefix, webengine_path, picute.query('sysroot')))
+    qmake_command='{}/usr/local/qt5/bin/qmake ' \
+        'WEBENGINE_CONFIG+=use_proprietary_codecs CONFIG+={}'.format(picute.query('sysroot'), build_mode)
+    print '>>> Qmake command:', qmake_command
+    rc=os.system('{} ; cd {} ; {}'.format(cmdline_prefix, webengine_path, qmake_command))
     if rc:
         print '>>> Qmake failed rc={} :-('.format(rc)
         sys.exit(1)

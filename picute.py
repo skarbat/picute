@@ -130,16 +130,6 @@ def baptize_image(picute):
         'libts-dev libudev-dev libxcb-xinerama0-dev ' \
         'libdbus-1-dev libicu-dev libglib2.0-dev '
 
-        # was needed for ffmpeg native libs
-        #'libavutil-dev=7:3.2-2~bpo8+2 libavcodec-dev=7:3.2-2~bpo8+2 libavformat-dev=7:3.2-2~bpo8+2 ' \
-        #'libvpx=1.6.0-2~bpo8+1 libopus-dev libopusfile-dev libwebp-dev '
-    
-    # Webengine specific dependencies (for FFMPEG native build mode) are pulled from Debian ARM backports repo
-    #picute.edfile('/etc/apt/sources.list.d/raspberrypi-backports.list',
-    #              'deb http://httpredir.debian.org/debian jessie-backports main contrib')
-    #picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553')
-    #picute.execute('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010')
-
     if picute.execute('apt-get update'):
         return False
     if picute.execute('apt-get install -y --no-install-recommends {}'.format(qt5_builddeps)):
@@ -173,6 +163,7 @@ if __name__ == '__main__':
     baptize=False
     wayland=False
     convert_image=False
+    debug_build=False
 
     # Xsysroot profile name that holds the original pipaOS image
     # (See the file xsysroot.conf for details)
@@ -225,15 +216,26 @@ if __name__ == '__main__':
     make_done=os.path.join(xtmp, 'make_done.chk')
     make_install_done=os.path.join(xtmp, 'make_install_done.chk')
 
-    configure_opts='-opengl es2 -eglfs -xcb -device linux-rasp-pi2-g++ ' \
-        '-device-option CROSS_COMPILE={}/{} ' \
-        '-sysroot {} -opensource -confirm-license -release -skip qtwayland ' \
-        '-prefix {} -pkg-config -no-pch -alsa -no-use-gold-linker -qt-xkbcommon ' \
-        '-xkb-config-root /usr/share/X11/xkb -skip qtwebengine -skip qtwebview ' \
-        '-nomake tests -nomake examples -verbose -no-warnings-are-errors ' \
-        '-no-qml-debug -optimized-qmake -strip -fontconfig -no-sql-sqlite'.format(
-            rpi_tools, xgcc_path + '/arm-linux-gnueabihf-',
-            picute.query('sysroot'), qt5_path_prefix)
+    if debug_build:
+        configure_opts='-opengl es2 -eglfs -xcb -device linux-rasp-pi2-g++ ' \
+            '-device-option CROSS_COMPILE={}/{} ' \
+            '-sysroot {} -opensource -confirm-license -debug -skip qtwayland ' \
+            '-prefix {} -pkg-config -no-pch -alsa -no-use-gold-linker -qt-xkbcommon ' \
+            '-xkb-config-root /usr/share/X11/xkb -skip qtwebengine -skip qtwebview ' \
+            '-nomake tests -nomake examples -verbose -no-warnings-are-errors ' \
+            '-qml-debug -optimized-qmake -strip -fontconfig -no-sql-sqlite'.format(
+                rpi_tools, xgcc_path + '/arm-linux-gnueabihf-',
+                picute.query('sysroot'), qt5_path_prefix)
+    else:
+        configure_opts_debug='-opengl es2 -eglfs -xcb -device linux-rasp-pi2-g++ ' \
+            '-device-option CROSS_COMPILE={}/{} ' \
+            '-sysroot {} -opensource -confirm-license -release -skip qtwayland ' \
+            '-prefix {} -pkg-config -no-pch -alsa -no-use-gold-linker -qt-xkbcommon ' \
+            '-xkb-config-root /usr/share/X11/xkb -skip qtwebengine -skip qtwebview ' \
+            '-nomake tests -nomake examples -verbose -no-warnings-are-errors ' \
+            '-no-qml-debug -optimized-qmake -strip -fontconfig -no-sql-sqlite'.format(
+                rpi_tools, xgcc_path + '/arm-linux-gnueabihf-',
+                picute.query('sysroot'), qt5_path_prefix)
 
     # Start from a clean image
     time_start=time.time()

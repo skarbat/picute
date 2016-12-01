@@ -2,20 +2,28 @@
 #
 # Build script - just to make life easier
 #
+#  Syntax: buildme <xsysroot profile name>
+#
 
-xsysroot_profile="picute"
+xsysroot_profile=$1
 logfile="build.log"
 
-if [ "$1" != "" ]; then
-    xsysroot_profile=$1
+if [ "$xsysroot_profile" == "" ]; then
+    echo "Need a profile name"
+    exit 1
+else
+    xsysroot -p $xsysroot_profile -s > /dev/null 2>&1
+    if [ "$?" != "0" ]; then
+	echo "xsysroot profile not found: $xsysroot_profile"
+	exit 1
+    fi
 fi
 
 # Fix for finding dbus libraries from the host into the sysroot
 export PKG_CONFIG_PATH="$(xsysroot -q sysroot)/usr/lib/arm-linux-gnueabihf/pkgconfig"
     
-echo "Building picute - follow progress on $logfile"
 python -u picute.py $xsysroot_profile --baptize > $logfile 2>&1
 if [ "$?" == "0" ]; then
-    echo "Building picute - follow progress on $logfile"
+    echo "Building picute using xsysroot profile: $xsysroot_profile - follow progress on $logfile"
     python -u piwebengine.py $xsysroot_profile >> $logfile 2>&1
 fi
