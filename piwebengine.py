@@ -9,6 +9,7 @@ import xsysroot
 
 if __name__ == '__main__':
 
+    # You want to be careful to enable a debug build. libQtWebengine.so takes 817MB :-)
     debug_build=False
     build_mode='release' if not debug_build else 'debug'
 
